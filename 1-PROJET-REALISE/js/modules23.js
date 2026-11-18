@@ -1,6 +1,6 @@
 /* ============================================================================
  * modules23.js — MODULE 3 : Boîte robotisée à double embrayage (DSG / DCT, arbres concentriques)
- *                (le MODULE 2, boîte automatique, est dans module2BVA.js)
+ *                (le MODULE 2, ZF EcoLife 2, est dans module2Eco.js / ecoSim.js ; l'ancienne version Lepelletier est archivée dans archive/lepelletier-v1/)
  *  Bases fonctionnelles : géométrie 3D, cinématique exacte (Willis / rapports de dents),
  *  sélection de pièces, vue éclatée, coupe, coloration SSP (pression hydraulique = orange).
  * ========================================================================== */
