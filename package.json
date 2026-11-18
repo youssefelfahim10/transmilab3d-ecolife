@@ -1,0 +1,10 @@
+{
+  "name": "transmilab3d",
+  "version": "1.0.0",
+  "description": "Simulateur 3D interactif de boîtes de vitesses pour la formation en maintenance automobile",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "build": "bash tools/build-standalone.sh"
+  }
+}

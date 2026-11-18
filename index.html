@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TransmiLab 3D — Simulateur de boîtes de vitesses</title>
+<meta name="description" content="Simulateur 3D interactif de boîtes de vitesses pour la formation en maintenance automobile : cinématique, synchroniseurs, diagnostic et réparation.">
+<script>(function(){try{var t=localStorage.getItem('tl3d_theme');if(!t){t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+} }
+</script>
+</head>
+<body>
+<header id="topbar">
+  <div class="brand"><span class="logo">⚙</span><b>TransmiLab</b><i>3D</i></div>
+  <nav id="moduleTabs" aria-label="Modules">
+    <button class="tab active" data-module="bvm"><b>Module 1</b><span>Boîte manuelle (BVM)</span></button>
+    <button class="tab" data-module="bva"><b>Module 2</b><span>ZF EcoLife 2 — 6AP (bus)</span></button>
+    <button class="tab" data-module="dct"><b>Module 3</b><span>Double embrayage (DCT)</span></button>
+  </nav>
+  <div class="top-actions">
+    <button id="btnTheme" class="btn ghost" title="Basculer mode clair / sombre" aria-label="Basculer mode clair ou sombre">☀ Clair</button>
+    <button id="btnTour" class="btn ghost" title="Visite guidée en 4 étapes">▶ Visite guidée</button>
+    <button id="btnHelp" class="btn ghost" title="Aide et raccourcis">? Aide</button>
+    <button id="btnFull" class="btn ghost" title="Plein écran" aria-label="Plein écran">⛶</button>
+  </div>
+</header>
+
+<main id="app">
+  <!-- ======================= GAUCHE : PILOTER LA BOÎTE ======================= -->
+  <aside id="left" class="panel">
+    <h2>🎮 Piloter la boîte</h2>
+    <button id="btnLesson" class="btn primary wide lesson-launch hidden">🎓 Parcours guidé : du moteur arrêté au 6ᵉ rapport<small>17 étapes · questions · hydraulique animée</small></button>
+    <section id="lesson" class="lesson hidden" aria-live="polite">
+      <div class="ls-head"><b id="lsStep">Étape 1 / 17</b><button id="lsClose" class="btn small ghost" title="Quitter le parcours">✕ Quitter</button></div>
+      <div class="ls-bar"><i id="lsProg"></i></div>
+      <h3 id="lsTitle"></h3>
+      <p id="lsText" class="ls-text"></p>
+      <div id="lsLookWrap"><div class="ls-sub">👀 Regardez</div><ul id="lsLook" class="ls-look"></ul></div>
+      <div id="lsActs" class="row wrap ls-acts"></div>
+      <div id="lsLive" class="ls-live"></div>
+      <div id="lsQuiz"></div>
+      <details id="lsDeep" class="ls-deep"><summary>🎓 Pour aller plus loin (ingénieurs)</summary><div id="lsDeepBody"></div></details>
+      <p id="lsNote" class="ls-note hidden"></p>
+      <div id="lsFinal" class="row wrap hidden"><button id="lsToDiag" class="btn small primary">🩺 Passer à la panne guidée</button></div>
+      <div class="ls-nav"><button id="lsPrev" class="btn">← Précédent</button><button id="lsNext" class="btn primary">Suivant →</button></div>
+    </section>
+
+    <details class="sec" open id="secShift">
+      <summary>Passer une vitesse</summary>
+      <div id="gateWrap" class="mod1only">
+        <div id="gate"></div>
+      </div>
+      <div id="gearBtns" class="gear-btns"></div>
+      <div class="row">
+        <button id="btnClutch" class="btn toggle wide" aria-pressed="false">Pédale d'embrayage : <b>relâchée</b></button>
+      </div>
+      <div class="row mod2only hidden">
+        <button id="btnBrake" class="btn toggle wide" aria-pressed="false">Pied sur le frein : <b>non</b></button>
+      </div>
+      <div class="row mod2only hidden">
+        <button id="btnEngine" class="btn toggle wide" aria-pressed="false">Moteur : <b>en marche</b></button>
+      </div>
+      <label class="slider mod2only hidden"><span>Ralentisseur (frein hydrodynamique)</span><output id="retVal">0 %</output>
+        <input type="range" id="retDem" min="0" max="100" step="5" value="0"></label>
+      <div class="row wrap mod2only hidden">
+        <label class="sel"><span>Pontage WK</span><select id="wkMode"><option value="auto">Auto</option><option value="open">Forcé ouvert</option><option value="closed">Forcé fermé</option></select></label>
+        <label class="sel"><span>AIS</span><select id="aisMode"><option value="on">Actif (Stop &amp; Start)</option><option value="off">Désactivé</option></select></label>
+      </div>
+      <div id="bvaTable" class="bva-table mod2only hidden"></div>
+      <div class="bva-views mod2only hidden"><span>Voir :</span>
+        <button class="btn small" data-bview="global">Boîte entière</button><button class="btn small" data-bview="conv">Convertisseur</button><button class="btn small" data-bview="trains">Trains</button><button class="btn small" data-bview="emb">Embrayages</button><button class="btn small" data-bview="ret">Ralentisseur</button><button class="btn small" data-bview="hydro">Hydraulique</button></div>
+      <p class="hint" id="hintGear">Cliquez une position du levier. Raccourcis : <kbd>0</kbd> <kbd>1</kbd>…<kbd>5</kbd> <kbd>R</kbd>, pédale <kbd>Espace</kbd>.</p>
+      <p class="hint mod2only hidden">Raccourcis : <kbd>P</kbd> <kbd>R</kbd> <kbd>N</kbd> <kbd>D</kbd>, <kbd>1</kbd>…<kbd>6</kbd> pour maintenir un rapport. En <b>D</b>, la boîte change seule (régime + charge). « Pied sur le frein » = test de calage.</p>
+    </details>
+
+    <details class="sec" open id="secEngine">
+      <summary>Moteur &amp; charge</summary>
+      <label class="slider"><span>Régime moteur</span><output id="rpmVal">800 tr/min</output>
+        <input type="range" id="rpm" min="800" max="6500" step="50" value="800"></label>
+      <div class="seg" role="radiogroup" aria-label="Charge">
+        <label><input type="radio" name="load" value="accel" checked><span>Accélération</span></label>
+        <label><input type="radio" name="load" value="stab"><span>Stabilisé</span></label>
+        <label><input type="radio" name="load" value="decel"><span>Frein moteur</span></label>
+      </div>
+      <label class="slider mod1only"><span>Température d'huile</span><output id="oilVal">22 °C</output>
+        <input type="range" id="oilT" min="10" max="110" step="1" value="22"></label>
+      <div class="row mod1only">
+        <button id="btnCold" class="btn small">❄ À froid</button>
+        <button id="btnHot" class="btn small">🔥 À chaud</button>
+        <label class="check inline"><input type="checkbox" id="autoWarm"><span>Chauffe auto</span></label>
+      </div>
+      <label class="slider mod1only"><span>Virage <small>(différentiel)</small></span><output id="turnVal">0 %</output>
+        <input type="range" id="turn" min="-100" max="100" step="5" value="0"></label>
+    </details>
+
+    <details class="sec" id="secTime">
+      <summary>Vitesse de l'animation</summary>
+      <label class="row"><span>Simulation</span>
+        <select id="timeScale">
+          <option value="1">× 1 (temps réel)</option><option value="0.5">× 0,5</option><option value="0.25">× 0,25</option><option value="0.1">× 0,1 (ralenti)</option>
+        </select></label>
+      <label class="slider"><span>Rotation affichée <small>(ralentie)</small></span><output id="visVal">100 %</output>
+        <input type="range" id="visSpeed" min="20" max="250" value="100"></label>
+    </details>
+
+    <details class="sec" id="secDisplay">
+      <summary>Affichage</summary>
+      <label class="check"><input type="checkbox" id="ssp" checked><span>Couleurs normalisées (couple · fourchette · fou)</span></label>
+      <label class="row"><span>Étiquettes 3D</span>
+        <select id="labelMode"><option value="off">Aucune</option><option value="main" selected>Principales</option><option value="all">Toutes</option></select></label>
+      <label class="check"><input type="checkbox" id="flowOn" checked><span>Chemin du couple (explication en clair)</span></label>
+      <label class="check"><input type="checkbox" id="xray"><span>Mode Rayons X</span></label>
+      <label class="check mod1only"><input type="checkbox" id="lub"><span>Lubrification (flux bleu)</span></label>
+      <label class="check mod1only"><input type="checkbox" id="rotHL"><span>Surligner ce qui tourne</span></label>
+      <label class="check"><input type="checkbox" id="sound"><span>Son d'atelier</span></label>
+      <label class="slider"><span>Opacité des carters</span><output id="housingVal">22 %</output>
+        <input type="range" id="housing" min="0" max="100" value="22"></label>
+    </details>
+  </aside>
+
+  <!-- ======================= VIEWPORT 3D ======================= -->
+  <section id="viewport">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+      <div id="labelLayer"></div>
+    </div>
+    <div id="hudTop">
+      <div class="hud-row">
+        <div id="coach" class="coach" aria-live="polite"></div>
+        <div id="phaseBanner" class="phase hidden">
+          <div class="phase-steps"><span data-p="1">1 · Débrayage</span><span data-p="2">2 · Synchronisation</span><span data-p="3">3 · Crabotage + embrayage</span></div>
+          <div id="phaseText"></div>
+          <div class="bar"><i id="phaseBar"></i></div>
+        </div>
+      </div>
+      <div id="flowBar" class="flowbar">
+        <div id="flowChips" class="chips"></div>
+        <div id="flowText"></div>
+      </div>
+      <div class="hud-notice">
+        <div id="toast" class="toast"></div>
+        <div id="pickHint" class="pick-hint hidden">🎯 Cliquez sur la pièce que vous jugez défectueuse</div>
+        <div id="scalpelHint" class="pick-hint scalpel hidden">✂ Mode scalpel : cliquez une pièce pour la masquer</div>
+      </div>
+    </div>
+    <div id="flash" class="flash"></div>
+    <div id="hudBottom">
+      <div id="legend" class="legend-bar">
+        <span><i style="background:#ff6a00"></i>Couple</span>
+        <span><i style="background:#2f8cff"></i>Huile</span>
+        <span><i style="background:#2ecc71"></i>Fourchette active</span>
+        <span><i style="background:#7b8088"></i>Pièce folle</span>
+        <span><i style="background:#ff2d2d"></i>Pièce défectueuse</span>
+      </div>
+      <div id="telemetry" class="telemetry" aria-label="Télémétrie terrain"></div>
+      <button id="btnTelMore" class="tel-more" title="Afficher plus de mesures">+ mesures</button>
+    </div>
+  </section>
+
+  <!-- ======================= DROITE : DÉCORTIQUER / FICHE / PANNE ======================= -->
+  <aside id="right" class="panel">
+    <div class="rtabs" role="tablist">
+      <button id="tabTools" class="rtab active" role="tab"><span>🔬</span>Décortiquer</button>
+      <button id="tabPart" class="rtab" role="tab"><span>📋</span>Fiche pièce</button>
+      <button id="tabHydro" class="rtab hidden" role="tab"><span>💧</span>Hydraulique</button>
+      <button id="tabDiag" class="rtab" role="tab"><span>🩺</span>Chercher la panne</button>
+    </div>
+
+    <!-- ---------- Onglet Décortiquer ---------- -->
+    <div id="paneTools" class="pane">
+      <div id="groupBar" class="group-bar hidden">
+        <div class="gb-title"><b id="gbName"></b><button id="btnGroupBack" class="btn small">↩ Boîte entière</button></div>
+        <label class="slider"><span>Écarter les pièces</span><output id="spreadVal">0 %</output>
+          <input type="range" id="spread" min="0" max="100" value="0"></label>
+        <p class="hint" id="gbHint"></p>
+      </div>
+
+      <div class="search"><input id="partSearch" type="search" placeholder="🔎 Chercher une pièce (anneau, clavette…)" aria-label="Chercher une pièce"></div>
+      <div class="toolrow">
+        <button id="btnScalpel" class="btn small toggle" aria-pressed="false" title="Cliquer une pièce dans la vue 3D la masque">✂ Mode scalpel</button>
+        <button id="btnShowAll" class="btn small">👁 Tout réafficher</button>
+        <button id="btnUndoHide" class="btn small" title="Réafficher la dernière pièce masquée">↶ Annuler</button>
+      </div>
+      <div id="partTree" class="tree"></div>
+
+      <details class="sec" id="secExplode">
+        <summary>Vue éclatée (ordre de démontage atelier)</summary>
+        <label class="slider"><span>Démontage progressif</span><output id="explVal">0 %</output>
+          <input type="range" id="expl" min="0" max="100" step="0.5" value="0"></label>
+        <div id="explLabel" class="expl-label">Boîte assemblée</div>
+        <div class="row"><button id="btnExplPlay" class="btn small">▶ Lecture auto</button>
+          <button id="btnExplReset" class="btn small">↺ Remonter</button></div>
+      </details>
+
+      <details class="sec" id="secSection">
+        <summary>Coupe (voir à l'intérieur)</summary>
+        <div class="row"><button id="btnAxial" class="btn small primary">✂ Coupe axiale en 1 clic</button>
+          <label class="check inline"><input type="checkbox" id="secOn"><span>Actif</span></label></div>
+        <label class="slider"><span>Profondeur de coupe</span><output id="secVal">0 %</output>
+          <input type="range" id="secAmt" min="0" max="100" step="1" value="0"></label>
+        <label class="row"><span>Plan</span>
+          <select id="secAxis"><option value="z">Longitudinal (axial)</option><option value="y">Horizontal</option><option value="x">Transversal</option></select></label>
+        <div class="row">
+          <label class="check inline"><input type="checkbox" id="secFlip"><span>Inverser</span></label>
+          <label class="check inline"><input type="checkbox" id="secCaps" checked><span>Hachures</span></label>
+        </div>
+      </details>
+
+      <details class="sec mod1only" id="secLoupe">
+        <summary>Zoom sur un synchroniseur (ralenti ×0,1)</summary>
+        <div class="row wrap">
+          <button class="btn small" data-loupe="12">🔍 Synchro 1/2</button>
+          <button class="btn small" data-loupe="34">🔍 Synchro 3/4</button>
+          <button class="btn small" data-loupe="5">🔍 Synchro 5</button>
+        </div>
+        <div class="row wrap">
+          <button class="btn small ghost" id="btnLoupeOff">↩ Vue globale</button>
+          <button class="btn small ghost" id="btnViewDiff">Pont</button>
+          <button class="btn small ghost" id="btnViewClutch">Embrayage</button>
+        </div>
+        <p class="hint">Caméra dédiée + coupe axiale + ralenti, puis passez un rapport sur le levier.</p>
+      </details>
+    </div>
+
+    <!-- ---------- Onglet Fiche pièce ---------- -->
+    <div id="panePart" class="pane hidden"></div>
+
+    <!-- ---------- Onglet Chercher la panne ---------- -->
+    <div id="paneHydro" class="pane hidden"></div>
+
+    <!-- ---------- Onglet Chercher la panne ---------- -->
+    <div id="paneDiag" class="pane hidden"></div>
+  </aside>
+</main>
+
+<div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="modal-card">
+    <button class="close" id="helpClose" aria-label="Fermer">✕</button>
+    <h2 id="helpTitle">Aide — TransmiLab 3D</h2>
+    <ul>
+      <li><b>À gauche : je pilote.</b> Levier en H, pédale d'embrayage, régime, charge, température d'huile.</li>
+      <li><b>À droite : j'analyse.</b> <b>Décortiquer</b> (arbre des pièces, isoler, masquer, écarter, vue éclatée, coupe), <b>Fiche pièce</b> (rôle, métrologie, symptômes, remontage) et <b>Chercher la panne</b> (démarche guidée).</li>
+      <li><b>Les 3 phases d'un passage :</b> ① débrayage · ② cône laiton / pignon fou, égalisation des vitesses · ③ crabotage et embrayage (flux <span style="color:#ff6a00">orange</span>).</li>
+      <li><b>Souris :</b> clic gauche = tourner · molette = zoomer · clic droit = déplacer · clic sur une pièce = fiche.</li>
+      <li>Les valeurs de métrologie, de serrage et de chiffrage sont des repères pédagogiques : se référer à la documentation constructeur.</li>
+    </ul>
+  </div>
+</div>
+
+<div id="tourModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+  <div class="modal-card tour">
+    <button class="close" id="tourClose" aria-label="Fermer">✕</button>
+    <div id="tourBody"></div>
+    <div class="tour-nav"><button id="tourPrev" class="btn">← Précédent</button><span id="tourDots"></span><button id="tourNext" class="btn primary">Suivant →</button></div>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

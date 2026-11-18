@@ -1,0 +1,10 @@
+# Dépendances et caches
+node_modules/
+.vercel/
+# Livrables générés (reconstruits par tools/build-standalone.sh et la chaîne de présentation)
+dist/
+dist-skills/
+presentation/*.pptx
+# Divers
+*.log
+.DS_Store
