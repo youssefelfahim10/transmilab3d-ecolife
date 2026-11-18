@@ -8,3 +8,4 @@ presentation/*.pptx
 # Divers
 *.log
 .DS_Store
+export/

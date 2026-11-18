@@ -53,11 +53,17 @@ js/
   materials.js        matériaux PBR (acier cémenté, laiton, fonte alu, élastomère) + codes couleurs SSP
   partBase.js         classe Part (pièce sélectionnable, style, glissement, rotation)
   module1BVM.js       MODULE 1 complet (80 pièces), rig d'animation, vue éclatée, coloration SSP
-  bvaSim.js           MODULE 2 — MOTEUR PHYSIQUE d'une boîte automatique 6 rapports (type Lepelletier) : équations de Willis
-                      avec les nombres de dents, tableau d'engagement, convertisseur + pontage, pression hydraulique,
-                      recouvrement des éléments, patinage, lois de passage, pannes
-  module2BVA.js       MODULE 2 — modèle 3D (62 pièces) : convertisseur, pompe, trains, embrayages A-B-E, freins C-D, bloc hydraulique
-  bvaParts.js         fiches des pièces du Module 2 ; atelierBVA.js : 3 pannes de boîte automatique
+  ecoSim.js           MODULE 2 — MOTEUR PHYSIQUE de la ZF EcoLife 2 (6 AP xx20 B) : 3 trains simples (Willis), embrayages A/B,
+                      freins D/E/F, convertisseur + roue libre + pontage WK, ralentisseur, pression PHD / A8 / D6 / D8,
+                      passages embrayage-sur-embrayage, AIS (accumulateur + clapet), thermique, sondes, pannes
+  module2Eco.js       MODULE 2 — modèle 3D (≈ 90 pièces) : convertisseur, pompe, ralentisseur, 3 trains, A/B, D/E/F,
+                      bloc hydraulique, valves, points de mesure ; coloration SSP ; vues caméra ; mise en évidence
+  ecoParts.js         fiches des pièces du Module 2 (rôle · métrologie · symptômes · remontage, repères [ZF p.])
+  atelierEco.js       7 cas pratiques EcoLife (A à G) + mesures en direct aux prises ZF
+  hydroDiagram.js     schéma hydraulique interactif (SVG) animé par la simulation, jauges avec plages ZF
+  lessonEco.js        PARCOURS GUIDÉ : 17 étapes « du moteur arrêté au 6ᵉ rapport » (textes, questions, mesures)
+  lessonUI.js         contrôleur du parcours (carte d'étape, caméra, onglet, pièces en surbrillance, quiz)
+  (hérités, inutilisés : bvaSim.js, module2BVA.js, bvaParts.js, atelierBVA.js — ancienne version type Lepelletier)
   modules23.js        MODULE 3 (DCT, arbres concentriques) — base fonctionnelle
   moduleBase.js       socle commun modules 2/3 (disques multidisques instanciés, style, éclaté)
   sectionView.js      plan de coupe dynamique + BOUCHAGE hachuré par stencil buffer (une couleur par matière)
@@ -71,12 +77,12 @@ js/
 
 ## Correspondance avec le cahier des charges
 
-1. **Modules** : onglets *Module 1* (BVM 5 + AR + différentiel, complet), *Module 2* (**boîte automatique 6 rapports
-   type Lepelletier** : convertisseur de couple avec stator + roue libre + pontage, pompe, train réducteur + train
-   Ravigneaux, embrayages A-B-E, freins C-D à pistons, bloc hydraulique et électrovannes, parking), *Module 3*
+1. **Modules** : onglets *Module 1* (BVM 5 + AR + différentiel, complet), *Module 2* (**ZF EcoLife 2 — boîte automatique 6 rapports pour bus** :
+   convertisseur de couple + pontage WK, pompe, ralentisseur, 3 trains épicycloïdaux, embrayages A-B, freins D-E-F,
+   bloc hydraulique à régulateurs, circuit complet animé), *Module 3*
    (DCT 6 rapports, arbres primaires concentriques, double embrayage, présélection + recouvrement — base fonctionnelle).
-   **Module 2** : tableau d'engagement (1 = A+D · 2 = A+C · 3 = A+B · 4 = A+E · 5 = B+E · 6 = C+E · AR = B+D), rapports
-   calculés avec les dents (4,19 · 2,34 · 1,51 · 1,14 · 0,87 · 0,69 · AR −3,40), passage par recouvrement en 3 phases
+   **Module 2** : tableau d'engagement (1 = A+F · 2 = A+E · 3 = A+D · 4 = A+B · 5 = B+D · 6 = B+E · AR = D+F), rapports
+   calculés avec les dents (3,36 · 1,98 · 1,44 · 1,00 · 0,70 · 0,59 · AR −3,77 ; écart avec le tableau ZF < 0,1 %), passage par recouvrement en 3 phases
    (remplissage du piston → transfert de couple → phase d'inertie), position P / R / N / D + rapports maintenus,
    lois de passage automatiques, test de calage (pied sur le frein), protections (P et AR refusés en roulant,
    rétrogradage refusé en sur-régime), **3 pannes guidées** (embrayage B usé · piston du frein D qui fuit · broutement du pontage)
@@ -103,10 +109,22 @@ Pouvoir de synchronisation `μ_eff = μ_santé × f(T_huile)` ; temps de synchro
 Si `t` dépasse le temps de poussée (1,3 s), le baladeur force l'anneau bloqué → **craquement**. Cône usé (μ = 0,5) +
 huile à 20 °C ⇒ craque ; même cône à 85 °C ⇒ passe ; cône sain à froid ⇒ passe (vérifié par simulation).
 
+## Parcours guidé (Module 2) et charte graphique
+
+- **Parcours guidé** : bouton « 🎓 Parcours guidé » en haut du panneau gauche du Module 2. 17 étapes dans l'ordre réel de la chaîne
+  (moteur arrêté → pompe → pression PHD → convertisseur → point mort → sélection D → calage → 1ʳᵉ → trains épicycloïdaux →
+  passage 1→2 au ralenti → rapports 2-6 → pontage WK → ralentisseur → arrêt moteur/AIS → bilan). Chaque étape : texte simple,
+  « Regardez », boutons qui pilotent la simulation, mesures en direct, mini-question corrigée, encart « Pour aller plus loin ».
+  Navigation : boutons ou touches ← →.
+- **Charte** : palette relevée sur le portail OMNIplus ON (cyan `#00ADEE`, bleu nuit `#041E42`, gris-bleu `#627389`,
+  fond `#F0F2F4`, coins 4 px). Thème **clair par défaut**, thème sombre bleu nuit. La police DaimlerCS (propriétaire) n'est pas
+  embarquée (police système). Les couleurs de fonction (pression orange, lubrification bleue, défaut rouge) restent celles de la norme SSP.
+  Le logo OMNIplus n'est pas reproduit.
+
 ## Raccourcis
 
 `0`/`N` point mort · `1`…`5`, `R` rapports · `Espace` pédale d'embrayage · `L` étiquettes · `Échap` quitter la sélection.
-Module 2 : `P` `R` `N` `D` (sélecteur) · `1`…`6` pour maintenir un rapport.
+Module 2 : `P` `R` `N` `D` (sélecteur) · `1`…`6` pour maintenir un rapport · `←` `→` dans le parcours guidé.
 
 ## Hypothèses et limites (à connaître avant la mise en main)
 
@@ -116,11 +134,13 @@ Module 2 : `P` `R` `N` `D` (sélecteur) · `1`…`6` pour maintenir un rapport.
   pas de lamages, pas de carter de fonderie détaillé : enveloppe convexe creuse).
 - Le baladeur d'AR reste en prise permanente avec le pignon d'AR du primaire (denture large) ; seule sa prise sur la
   couronne du baladeur 1/2 est commandée. Pas de synchroniseur d'AR : l'AR n'est autorisée qu'à l'arrêt.
-- **Module 2 (boîte automatique)** : nombres de dents GÉNÉRIQUES (calibrés pour retrouver les rapports usuels de
-  cette architecture, ce ne sont pas ceux d'un modèle précis) ; implantation axiale SIMPLIFIÉE (schéma fonctionnel :
-  une boîte réelle est plus compacte, tambours imbriqués) ; pas de roues libres de boîte, pas de frein à bande, pas de
-  refroidisseur, pas de calculateur détaillé ; modèle de pression / patinage / convertisseur simplifié (ordres de
-  grandeur). Autres architectures (Simpson, Ravigneaux seul, 8 rapports, CVT) non modélisées.
+- **Module 2 (ZF EcoLife 2)** : rapports, pressions (PHD 10-12 bar, A8, D6, D8), plages de mesure, règles de
+  diagnostic (élément commun, Δp filtre < 0,8 bar, PHD ≥ 1,5 bar après 20 s) et repères hydrauliques viennent du
+  *manuel technique ZF EcoLife 2* fourni. En revanche : (1) les **liaisons internes des trois trains** sont
+  RECONSTRUITES par calcul pour retrouver le tableau de rapports ZF (le schéma cinématique constructeur n'était pas
+  disponible) — à valider avec le formateur ; (2) nombres de dents déduits (trains 1-2 : 66/156, train 3 : 74/122) ;
+  (3) implantation axiale SIMPLIFIÉE ; (4) dynamique de pression, de patinage et de température = ordres de grandeur ;
+  (5) pas de pilotage CAN ni de calculateur détaillé.
 - Module 3 : 6 rapports AV, sans AR, baladeurs sans anneaux détaillés ni fourchettes ; cas pratiques à écrire.
 - Rotation affichée volontairement ralentie (stroboscopie à 3000 tr/min) : les **rapports de vitesses restent exacts**.
 - Testé dans Chromium (rendu logiciel) ; non testé sur tablette/tactile ni Safari. Charge ≈ 0,7 M triangles
