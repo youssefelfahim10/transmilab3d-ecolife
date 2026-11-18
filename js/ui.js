@@ -287,7 +287,7 @@ export function initUI(app) {
       else if (g === 'R') text = `<b>Marche arrière</b> : le baladeur d'AR inverse le sens (${REV.Zring}/${REV.Zr} = ${IR.toFixed(2).replace('.', ',')}), puis le pont divise encore par ${IP.toFixed(2).replace('.', ',')}. ${Math.round(t.rpm)} tr/min moteur → ${Math.round(Math.abs(t.nWheels))} tr/min aux roues.`;
       else { const { Zp, Zs } = GEAR_PAIRS[g]; const r = ratioText(g);
         text = `<b>${ORD[g]}</b> : le pignon fixe de <b>${Zp} dents</b> entraîne le pignon fou de <b>${Zs} dents</b> → régime ÷ ${r.value}. Le pont (${FD.Zcrown}/${FD.Zpin}) divise encore ÷ ${IP.toFixed(2).replace('.', ',')}. <b>${Math.round(t.rpm)} tr/min</b> moteur → <b>${Math.round(Math.abs(t.nWheels))} tr/min</b> aux roues = <b>${Math.round(Math.abs(t.v))} km/h</b>.`; }
-    } else if (m.id === 'bva') {
+    } else if (typeof sim.explain === 'function') {            // tout module fournissant explain() → { chips:[[libellé, actif]], text }
       const ex = sim.explain(); chips = ex.chips; text = ex.text;
     } else {
       const g = sim.gear;

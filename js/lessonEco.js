@@ -213,3 +213,11 @@ export const AUTO = {
   14: [{ t: 2500, run: ({ ui }) => ui.setRetarder(100) }, { t: 15000, run: ({ ui }) => ui.setRetarder(0) }],
   15: [{ t: 3000, run: ({ ui }) => ui.setEngine(false) }, { t: 26000, run: ({ ui }) => ui.setEngine(true) }],
 };
+
+/** Remise à zéro des commandes avant chaque étape (propre au module EcoLife) */
+export const resetEco = ({ sim, ui, app }) => {
+  ui.setRetarder(0); sim.wkMode = 'auto'; const w = document.getElementById('wkMode'); if (w) w.value = 'auto';
+  ui.setBrake(false); app.setTimeScale(1);
+  sim.load = 'accel'; document.querySelectorAll('input[name=load]').forEach((r) => { r.checked = r.value === 'accel'; });
+  sim.mode = 'auto';
+};

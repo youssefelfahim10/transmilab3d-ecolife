@@ -1,0 +1,20 @@
+<!-- À coller en tête du panneau gauche (index.html), juste sous le <h2> « Piloter la boîte » -->
+<button id="btnLesson" class="btn primary wide lesson-launch hidden">🎓 Parcours guidé : du moteur arrêté au 6ᵉ rapport<small>17 étapes · questions · hydraulique animée</small></button>
+    <button id="btnAutoLesson" class="btn wide lesson-auto hidden">▶ Démonstration automatique (la simulation se lance et s'explique seule)</button>
+    <section id="lesson" class="lesson hidden" aria-live="polite">
+      <div class="ls-head"><b id="lsStep">Étape 1 / 17</b><button id="lsClose" class="btn small ghost" title="Quitter le parcours">✕ Quitter</button></div>
+      <div class="ls-play"><button id="lsPlay" class="btn small primary" title="Lancer / mettre en pause la démonstration automatique">▶ Lecture auto</button>
+        <label class="check inline" title="Lit le texte à voix haute (navigateur)"><input type="checkbox" id="lsVoice"><span>🔊 Voix</span></label>
+        <span id="lsTimerWrap" class="ls-timer hidden"><i id="lsTimer"></i></span></div>
+      <div class="ls-bar"><i id="lsProg"></i></div>
+      <h3 id="lsTitle"></h3>
+      <p id="lsText" class="ls-text"></p>
+      <div id="lsLookWrap"><div class="ls-sub">👀 Regardez</div><ul id="lsLook" class="ls-look"></ul></div>
+      <div id="lsActs" class="row wrap ls-acts"></div>
+      <div id="lsLive" class="ls-live"></div>
+      <div id="lsQuiz"></div>
+      <details id="lsDeep" class="ls-deep"><summary>🎓 Pour aller plus loin (ingénieurs)</summary><div id="lsDeepBody"></div></details>
+      <p id="lsNote" class="ls-note hidden"></p>
+      <div id="lsFinal" class="row wrap hidden"><button id="lsToDiag" class="btn small primary">🩺 Passer à la panne guidée</button></div>
+      <div class="ls-nav"><button id="lsPrev" class="btn">← Précédent</button><button id="lsNext" class="btn primary">Suivant →</button></div>
+    </section>

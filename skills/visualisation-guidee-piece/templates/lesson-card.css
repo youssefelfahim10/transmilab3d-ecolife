@@ -1,0 +1,85 @@
+/* ---- Parcours guidé (carte pédagogique) ---- */
+.lesson-launch { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 10px; margin-bottom: 10px; font-size: 14px; }
+.lesson-launch small { font-weight: 500; opacity: .9; font-size: 11.5px; }
+.lesson { background: var(--raised); border: 1.5px solid var(--acc); border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+.lesson.hidden, .lesson .hidden { display: none; }
+.ls-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--acc2); }
+.ls-bar { height: 5px; background: var(--inset); border-radius: 4px; overflow: hidden; }
+.ls-bar i { display: block; height: 100%; background: var(--acc); transition: width .3s; }
+.lesson h3 { margin: 2px 0 0; font-size: 16px; line-height: 1.25; }
+.ls-text { margin: 0; font-size: 13.5px; line-height: 1.5; }
+.ls-sub { font-size: 12px; font-weight: 800; color: var(--acc2); margin-bottom: 2px; }
+.ls-look { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }
+.ls-acts { gap: 6px; }
+.ls-live { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 6px; }
+.lsm { background: var(--inset); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 11px; color: var(--muted); }
+.lsm b { font-size: 15px; color: var(--fg); margin-right: 3px; font-variant-numeric: tabular-nums; }
+.lsm small { display: block; } .lsm em { font-style: normal; font-size: 10.5px; }
+.lsm.ok b { color: #3fb950; } .lsm.bad b { color: #ff4d4d; }
+.ls-q { font-size: 13px; margin-top: 2px; }
+.ls-opts { display: flex; flex-direction: column; gap: 5px; margin-top: 5px; }
+.ls-opt { text-align: left; white-space: normal; line-height: 1.3; }
+.ls-opt.good { border-color: #3fb950; background: rgba(63,185,80,.15); }
+.ls-opt.bad { border-color: #ff4d4d; background: rgba(255,77,77,.12); }
+.ls-why { margin: 4px 0 0; font-size: 12.5px; line-height: 1.4; } .ls-why.good { color: #3fb950; } .ls-why.bad { color: #ff8a6a; }
+.ls-deep { font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.ls-deep summary { cursor: pointer; font-weight: 700; color: var(--fg); }
+.ls-note { margin: 0; font-size: 11.5px; color: var(--muted); font-style: italic; }
+.ls-nav { display: flex; gap: 8px; } .ls-nav .btn { flex: 1; padding: 10px 6px; }
+.ls-nav .btn:disabled { opacity: .4; cursor: default; }
+
+/* ============================================================================
+ * Charte « OMNIplus ON » (Daimler Buses) — palette relevée sur le portail OMNIplus ON :
+ *   cyan #00ADEE · bleu nuit #041E42 · gris-bleu #627389 · fond #F0F2F4 · rayon 4 px.
+ * Remarque : la police DaimlerCS (propriétaire) n'est pas embarquée ; police système neutre à la place.
+ * Les couleurs de FONCTION (pression orange, lubrification bleue, défaut rouge…) restent celles de la norme SSP.
+ * ========================================================================== */
+:root, :root[data-theme="dark"] {
+  --bg: #061327; --bg2: #0a1d3a; --panel: #0b2345; --panel2: #102c55; --line: #1e3f6e; --line2: #2a5083; --line3: #4c78ad;
+  --txt: #e6eef7; --mut: #9fb3cc; --strong: #ffffff; --acc: #00adee; --acc2: #6ad3f7; --cyan: #00adee; --cyan-line: #1b6d8f; --lub: #3399ff; --cold: #7cc4ff;
+  --inset: #081a33; --inset2: #0f2850; --raised: #12315e; --btn: #12315e; --btn-h: #1a4180; --hover: #14376a; --chip: #1e3f6e; --chip2: #14325c;
+  --hud: rgba(6, 19, 39, .93); --lbl-bg: rgba(6, 19, 39, .86); --lbl-fg: #e6eef7;
+  --acc-bg: #0a3a5c; --bad-bg: #3a1418; --ok-bg: #0f3324; --warn-bg: #3a2d08;
+  --vp1: #123465; --vp2: #061326; --top1: #0a2142; --top2: #071a35;
+  --on-bg: #00adee; --on-fg: #041e42; --pri-bg: #00adee; --pri-fg: #041e42; --pri-h: #33c0f3;
+  --radius: 6px;
+}
+:root[data-theme="light"] {
+  --bg: #f0f2f4; --bg2: #ffffff; --panel: #ffffff; --panel2: #f0f2f4; --line: #d5dce3; --line2: #b9c4cf; --line3: #8a99aa;
+  --txt: #041e42; --mut: #566b84; --strong: #041e42; --acc: #00adee; --acc2: #00709e; --cyan: #00709e; --cyan-line: #9acbe0; --lub: #1f6fd6; --cold: #1f6fd6;
+  --inset: #f0f2f4; --inset2: #e6eaee; --raised: #ffffff; --btn: #e8edf2; --btn-h: #d5dee8; --hover: #e4f5fd; --chip: #d5e3ee; --chip2: #e8eef3;
+  --hud: rgba(255, 255, 255, .95); --lbl-bg: rgba(255, 255, 255, .95); --lbl-fg: #041e42;
+  --acc-bg: #d6f1fc; --bad-bg: #fde0e0; --ok-bg: #dcf3e4; --warn-bg: #fdf0c8;
+  --vp1: #f9fbfc; --vp2: #c9d3de; --top1: #ffffff; --top2: #ffffff;
+  --on-bg: #041e42; --on-fg: #ffffff; --pri-bg: #041e42; --pri-fg: #ffffff; --pri-h: #0b3269;
+}
+body { font: 15px/1.5 "Segoe UI", "Helvetica Neue", Arial, system-ui, -apple-system, sans-serif; }
+#topbar { border-bottom: 3px solid transparent; border-image: linear-gradient(90deg, #00adee, #041e42) 1; }
+.brand .logo { color: var(--acc); } .brand b { color: var(--strong); } .brand i { color: var(--acc); }
+.btn, .tab, .rtab { border-radius: 4px; }
+.btn.primary { background: var(--pri-bg); border-color: var(--pri-bg); color: var(--pri-fg); }
+.btn.primary:hover { background: var(--pri-h); border-color: var(--pri-h); }
+/* états « actif » : fond plein contrasté (bleu nuit en clair, cyan en sombre) */
+:root .seg input:checked + span, :root .pill.on, :root .gear-btns button.on, :root .phase-steps span.on, :root .chip-n.on,
+:root .scn button b, :root .steps .cur i, :root .card.step.cur h4 i, :root .steps button.view i,
+:root .bva-table tr.cur th, :root .bva-table td.lit { background: var(--on-bg); color: var(--on-fg); border-color: var(--on-bg); }
+:root .steps .cur i, :root .steps button.view i { box-shadow: 0 0 0 3px rgba(0, 173, 238, .3); }
+.btn.toggle[aria-pressed="true"] { background: var(--acc-bg); border-color: var(--acc); color: var(--acc2); }
+.tab.active { border-color: var(--acc); box-shadow: inset 0 -3px 0 var(--acc); }
+.tab b, .rtab.active { color: var(--acc2); }
+.lesson { border-color: var(--acc); background: var(--raised); }
+.ls-bar i { background: var(--acc); }
+.lesson h3 { color: var(--strong); }
+.lesson-launch { background: var(--pri-bg); color: var(--pri-fg); border-color: var(--pri-bg); }
+.lesson-launch small { color: inherit; }
+.panel h2 { color: var(--acc2); }
+.toast { border-color: var(--acc); }
+:focus-visible { outline: 2px solid var(--acc); }
+
+/* ---- Démonstration automatique ---- */
+.lesson-auto { margin-bottom: 10px; white-space: normal; line-height: 1.3; border-color: var(--acc); color: var(--acc2); font-weight: 700; }
+.lesson-auto.hidden, .lesson-launch.hidden { display: none; }
+.ls-play { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ls-timer { flex: 1 1 80px; height: 5px; background: var(--inset2); border-radius: 4px; overflow: hidden; min-width: 60px; }
+.ls-timer i { display: block; height: 100%; width: 0; background: var(--acc2); }
+.ls-timer.hidden { display: none; }
