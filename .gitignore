@@ -1,11 +1,8 @@
 # Dépendances et caches
 node_modules/
 .vercel/
-# Livrables générés (reconstruits par tools/build-standalone.sh et la chaîne de présentation)
-dist/
-dist-skills/
-presentation/*.pptx
-# Divers
+# Livrables générés (reconstruits par 1-PROJET-REALISE/tools/build-standalone.sh) — sauf le dossier livrables/
+1-PROJET-REALISE/dist/
+2-COMMENT-REALISE/07-presentation/*.pptx
 *.log
 .DS_Store
-export/

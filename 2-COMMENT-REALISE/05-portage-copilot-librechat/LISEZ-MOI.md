@@ -1,5 +1,8 @@
 # Mettre les skills TransmiLab 3D sur GitHub Copilot ou LibreChat
 
+> **Dans CE dépôt, l'installation Copilot est déjà faite** : les 5 skills sont dans `.github/skills/` et les règles du projet dans `AGENTS.md` et `.github/copilot-instructions.md` (racine). Les fichiers `.skill` à importer dans LibreChat sont dans `2-COMMENT-REALISE/02-skills/importables/`. Les sections ci-dessous décrivent le **paquet autonome** à copier dans un autre dépôt.
+
+
 **Réponse courte : oui.** Ces skills sont au format **Agent Skills** (`SKILL.md` + dossiers `references/`, `scripts/`, `templates/`), un **standard ouvert** (agentskills.io) que GitHub Copilot et LibreChat lisent tous les deux. Vérifié dans leurs documentations officielles (VS Code « Use Agent Skills », GitHub Docs « Add agent skills », LibreChat « Skills »).
 
 > ⚠ **Je n'ai pas pu tester dans votre Copilot ni votre LibreChat** : seule la conformité au format est vérifiée. Faites la petite vérification indiquée plus bas.

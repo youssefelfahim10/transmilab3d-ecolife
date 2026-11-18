@@ -1,19 +1,19 @@
 # Guide — reproduire la visualisation guidée TransmiLab 3D pour une autre pièce
 
-> Document unique (Markdown) généré à partir du skill `visualisation-guidee-piece`. Il contient la méthode, les contrats du code, l'écriture d'un parcours guidé, la charte OMNIplus ON et les pièges. Les fichiers de code sont dans le dossier `visualisation-guidee-piece/` du kit.
+> Document unique (Markdown) généré à partir du skill `visualisation-guidee-piece`. Il contient la méthode, les contrats du code, l'écriture d'un parcours guidé, la charte OMNIplus ON et les pièges. Les fichiers de code sont dans le dossier `.github/skills/visualisation-guidee-piece/` du kit.
 
 ## Contenu du kit
-- `visualisation-guidee-piece/SKILL.md` : le skill (à déposer dans `~/.claude/skills/` ou à importer).
-- `visualisation-guidee-piece/templates/` : modèles de code **testés** (sim, module 3D, fiches, parcours, CSS, carte HTML).
-- `visualisation-guidee-piece/reference-implementation/` : le code réel de la ZF EcoLife 2.
-- `visualisation-guidee-piece/scripts/` : `scaffold.py` (génère + branche un module), `smoke_test.cjs` (déroule le parcours en navigateur), `build-standalone.sh`, recherche de topologies de trains.
-- `socle/` : l'application complète (js/, css/, index.html, vendor/ Three.js) pour repartir d'un projet qui fonctionne.
+- `.github/skills/visualisation-guidee-piece/SKILL.md` : le skill (à déposer dans `~/.claude/skills/` ou à importer).
+- `.github/skills/visualisation-guidee-piece/templates/` : modèles de code **testés** (sim, module 3D, fiches, parcours, CSS, carte HTML).
+- `.github/skills/visualisation-guidee-piece/reference-implementation/` : le code réel de la ZF EcoLife 2.
+- `.github/skills/visualisation-guidee-piece/scripts/` : `scaffold.py` (génère + branche un module), `smoke_test.cjs` (déroule le parcours en navigateur), `build-standalone.sh`, recherche de topologies de trains.
+- `1-PROJET-REALISE/` : l'application complète (js/, css/, index.html, vendor/ Three.js) pour repartir d'un projet qui fonctionne.
 
 ## Démarrage en 3 commandes
 ```bash
-python3 visualisation-guidee-piece/scripts/scaffold.py --root socle --id pompe --class Pompe --title "Pompe à engrenages" --wire
-cd socle && python3 -m http.server 8765
-NODE_PATH=$(npm root -g) node ../visualisation-guidee-piece/scripts/smoke_test.cjs http://localhost:8765/index.html pompe
+python3 .github/skills/visualisation-guidee-piece/scripts/scaffold.py --root 1-PROJET-REALISE --id pompe --class Pompe --title "Pompe à engrenages" --wire
+cd 1-PROJET-REALISE && python3 -m http.server 8765
+NODE_PATH=$(npm root -g) node ../.github/skills/visualisation-guidee-piece/scripts/smoke_test.cjs http://localhost:8765/index.html pompe
 ```
 Le module créé charge, s'anime (arbre, pignon, embrayage à disques), se coupe, s'éclate et déroule son parcours ; remplacer ensuite le contenu d'exemple par la vraie pièce.
 
