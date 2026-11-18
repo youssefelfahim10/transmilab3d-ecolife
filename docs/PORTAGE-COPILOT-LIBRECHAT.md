@@ -14,6 +14,7 @@
 | `librechat/skills/*.skill` | les 5 skills à importer dans LibreChat |
 | `librechat/prompt-agent-concepteur.md` | instructions pour un agent LibreChat dédié |
 | `projet/` | l'application TransmiLab 3D complète (point de départ) |
+| `docs-a-mettre-en-place/` | **PROMPT-MAITRE.md** (le prompt à utiliser), **DOCUMENTS-A-PREPARER.md** (les documents à fournir / créer) et `modeles/` (cahier des charges, extraction, plan du parcours, recette, AGENTS) |
 
 Les 5 skills :
 

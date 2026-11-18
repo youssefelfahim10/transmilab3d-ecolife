@@ -43,6 +43,7 @@ NODE_PATH=$(npm root -g) node scripts/smoke_test.cjs http://localhost:8765/index
 - `references/charte-omniplus.md` — palette, jetons CSS clair/sombre, règles de contraste.
 - `references/pieges.md` — erreurs déjà commises et leur correction.
 - `templates/` — `sim`, `module`, `parts`, `lesson` (JS), `theme-omniplus.css`, `lesson-card.css/.html`.
+- `templates/docs/` — **`PROMPT-MAITRE.md`** (prompt court, prompt complet, prompts par phase, prompts de correction), **`DOCUMENTS-A-PREPARER.md`** (documents à fournir et à créer, ordre de mise en place) et les modèles à remplir : `AGENTS.modele.md`, `cahier-des-charges.md`, `extraction.md`, `plan-parcours.md`, `recette.md`.
 - `reference-implementation/` — le code RÉEL de l'EcoLife 2 (sim 403 l., module 3D, fiches, 7 cas, schéma hydraulique, parcours 17 étapes, contrôleur).
 - `scripts/` — `scaffold.py`, `smoke_test.cjs`, `build-standalone.sh`, `topo_trains.py` (recherche de topologies de trains épicycloïdaux), `fit_dents.py` (ajustement des nombres de dents).
 
