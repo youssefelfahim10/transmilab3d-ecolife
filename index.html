@@ -35,8 +35,12 @@
   <aside id="left" class="panel">
     <h2>🎮 Piloter la boîte</h2>
     <button id="btnLesson" class="btn primary wide lesson-launch hidden">🎓 Parcours guidé : du moteur arrêté au 6ᵉ rapport<small>17 étapes · questions · hydraulique animée</small></button>
+    <button id="btnAutoLesson" class="btn wide lesson-auto hidden">▶ Démonstration automatique (la simulation se lance et s'explique seule)</button>
     <section id="lesson" class="lesson hidden" aria-live="polite">
       <div class="ls-head"><b id="lsStep">Étape 1 / 17</b><button id="lsClose" class="btn small ghost" title="Quitter le parcours">✕ Quitter</button></div>
+      <div class="ls-play"><button id="lsPlay" class="btn small primary" title="Lancer / mettre en pause la démonstration automatique">▶ Lecture auto</button>
+        <label class="check inline" title="Lit le texte à voix haute (navigateur)"><input type="checkbox" id="lsVoice"><span>🔊 Voix</span></label>
+        <span id="lsTimerWrap" class="ls-timer hidden"><i id="lsTimer"></i></span></div>
       <div class="ls-bar"><i id="lsProg"></i></div>
       <h3 id="lsTitle"></h3>
       <p id="lsText" class="ls-text"></p>

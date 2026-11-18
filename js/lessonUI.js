@@ -3,13 +3,13 @@
  *   - applique l'état de simulation, la vue caméra, l'onglet et la mise en évidence de chaque étape
  *   - boutons d'action, mini-question avec correction, mesures en direct, navigation
  * ========================================================================== */
-import { LESSON } from './lessonEco.js';
+import { LESSON, AUTO } from './lessonEco.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 
 export function initLesson(app, ui) {
   const card = $('#lesson'), launcher = $('#btnLesson');
-  const st = { on: false, i: 0, answered: {} };
+  const st = { on: false, i: 0, answered: {}, auto: false, timers: [] };
   app.lessonFocus = new Set();
 
   /** Remet les commandes dans un état neutre avant d'appliquer l'étape */
@@ -84,32 +84,70 @@ export function initLesson(app, ui) {
   const start = () => {
     if (app.module.id !== 'bva') return;
     st.on = true; st.i = 0; st.answered = {};
-    card.classList.remove('hidden'); launcher.classList.add('hidden');
+    card.classList.remove('hidden'); launcher.classList.add('hidden'); $('#btnAutoLesson').classList.add('hidden');
     ui.clearIsolation?.();
     apply();
   };
   const stop = () => {
-    st.on = false; app.lessonFocus = new Set(); card.classList.add('hidden');
-    if (app.module.id === 'bva') launcher.classList.remove('hidden');
+    stopAuto(); st.on = false; app.lessonFocus = new Set(); card.classList.add('hidden');
+    if (app.module.id === 'bva') { launcher.classList.remove('hidden'); $('#btnAutoLesson').classList.remove('hidden'); }
     const sim = app.module.sim; app.setTimeScale(1); if (sim.engineOn === false) ui.setEngine(true);
     ui.setRetarder(0); ui.setBrake(false);
   };
   ui.lessonStop = stop;
   ui.lessonActive = () => st.on;
 
+
+  /* ------------------------------------------------------------ démonstration automatique */
+  const plain = (h) => h.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const clearTimers = () => { st.timers.forEach(clearTimeout); st.timers = []; try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) { /* voix indisponible */ } const t = $('#lsTimer'); if (t) { t.style.transition = 'none'; t.style.width = '0%'; } };
+  const setPlayUi = () => { $('#lsPlay').textContent = st.auto ? '⏸ Pause' : '▶ Lecture auto'; $('#lsTimerWrap').classList.toggle('hidden', !st.auto); };
+  const stopAuto = () => { st.auto = false; clearTimers(); setPlayUi(); };
+  /** Durée minimale d'affichage d'une étape : temps de lecture du texte, ou dernière action + 6 s */
+  const dwell = (i) => {
+    const s = LESSON[i], words = plain(s.text + ' ' + (s.look || []).join(' ')).split(' ').length;
+    const acts = AUTO[i] || [], last = acts.length ? acts[acts.length - 1].t + 6000 : 0;
+    return Math.max(9000, words * 330, last);
+  };
+  const playStep = () => {
+    if (!st.auto) return;
+    clearTimers();
+    const i = st.i, s = LESSON[i], ms = dwell(i);
+    (AUTO[i] || []).forEach((a) => st.timers.push(setTimeout(() => a.run({ sim: app.module.sim, ui, app }), a.t)));
+    if (s.quiz) st.timers.push(setTimeout(() => { st.answered[i] = s.quiz.ok; render(); }, Math.min(ms * 0.75, ms - 2500)));   // la bonne réponse s'affiche en fin d'étape
+    const t = $('#lsTimer'); if (t) { t.style.transition = 'none'; t.style.width = '0%'; void t.offsetWidth; t.style.transition = `width ${ms}ms linear`; t.style.width = '100%'; }
+    let voiceDone = true;
+    if ($('#lsVoice').checked && 'speechSynthesis' in window) {
+      voiceDone = false;
+      const u = new SpeechSynthesisUtterance(`${s.t}. ${plain(s.text)}`); u.lang = 'fr-FR'; u.rate = 0.95;
+      u.onend = () => { voiceDone = true; tryNext(); }; u.onerror = () => { voiceDone = true; tryNext(); };
+      window.speechSynthesis.speak(u);
+    }
+    let timeDone = false;
+    const tryNext = () => { if (!st.auto || !timeDone || !voiceDone) return; next(); };
+    st.timers.push(setTimeout(() => { timeDone = true; tryNext(); }, ms));
+  };
+  const next = () => {
+    if (st.i < LESSON.length - 1) { st.i++; apply(); playStep(); }
+    else { stopAuto(); }        // fin du parcours : on s'arrête sur le bilan
+  };
+  const startAuto = () => { st.auto = true; setPlayUi(); playStep(); };
+  $('#lsPlay').addEventListener('click', () => { if (st.auto) stopAuto(); else startAuto(); });
+  $('#btnAutoLesson').addEventListener('click', () => { start(); startAuto(); });
+
   launcher.addEventListener('click', start);
   $('#lsClose').addEventListener('click', stop);
-  $('#lsPrev').addEventListener('click', () => { if (st.i > 0) { st.i--; apply(); } });
-  $('#lsNext').addEventListener('click', () => { if (st.i < LESSON.length - 1) { st.i++; apply(); } else { st.i = 0; st.answered = {}; apply(); } });
+  $('#lsPrev').addEventListener('click', () => { stopAuto(); if (st.i > 0) { st.i--; apply(); } });
+  $('#lsNext').addEventListener('click', () => { stopAuto(); if (st.i < LESSON.length - 1) { st.i++; apply(); } else { st.i = 0; st.answered = {}; apply(); } });
   $('#lsToDiag')?.addEventListener('click', () => { stop(); ui.showTab('diag'); });
   /* navigation clavier : flèches quand le focus n'est pas dans un champ */
   window.addEventListener('keydown', (e) => {
     if (!st.on || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
-    if (e.key === 'ArrowRight' && st.i < LESSON.length - 1) { st.i++; apply(); } else if (e.key === 'ArrowLeft' && st.i > 0) { st.i--; apply(); }
+    if (e.key === 'ArrowRight' && st.i < LESSON.length - 1) { stopAuto(); st.i++; apply(); } else if (e.key === 'ArrowLeft' && st.i > 0) { stopAuto(); st.i--; apply(); }
   });
   /** À appeler quand on change de module : quitte la leçon et montre/masque le lanceur */
   ui.lessonModule = (isBus) => {
-    if (st.on) { st.on = false; app.lessonFocus = new Set(); card.classList.add('hidden'); }
-    launcher.classList.toggle('hidden', !isBus);
+    if (st.on) { stopAuto(); st.on = false; app.lessonFocus = new Set(); card.classList.add('hidden'); }
+    launcher.classList.toggle('hidden', !isBus); $('#btnAutoLesson').classList.toggle('hidden', !isBus);
   };
 }

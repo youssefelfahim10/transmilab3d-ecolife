@@ -198,3 +198,18 @@ export const LESSON = [
     note: 'Limites du modèle : géométrie simplifiée ; liaisons internes des trains reconstruites à partir des rapports ZF (écart < 0,1 %), à valider avec le schéma constructeur.',
   },
 ];
+
+/** Scénario de la DÉMONSTRATION AUTOMATIQUE : actions chronométrées (t en ms après l'arrivée sur l'étape), par numéro d'étape (0 = première).
+ *  Les étapes sans action restent affichées le temps de lire (ou d'entendre) le texte. */
+export const AUTO = {
+  3: [{ t: 3000, run: ({ sim }) => { sim.engineRpm = 1800; } }, { t: 9000, run: ({ sim }) => { sim.engineRpm = 650; } }],
+  4: [{ t: 3500, run: ({ sim }) => { sim.engineRpm = 1800; } }, { t: 10000, run: ({ sim }) => { sim.engineRpm = 650; } }],
+  6: [{ t: 2500, run: ({ ui }) => ui.requestGear('D') }],
+  7: [{ t: 3000, run: ({ sim }) => { sim.engineRpm = 2000; } }],
+  10: [{ t: 5000, run: ({ ui }) => ui.requestGear(2) }],
+  11: [{ t: 1000, run: ({ sim }) => { sim.forceGear(2, 1800); } }, { t: 7000, run: ({ sim }) => { sim.forceGear(3, 1800); } }, { t: 13000, run: ({ sim }) => { sim.forceGear(4, 1800); } }],
+  12: [{ t: 1000, run: ({ sim }) => { sim.forceGear(5, 1500); } }, { t: 8000, run: ({ sim }) => { sim.forceGear(6, 1500); } }],
+  13: [{ t: 11000, run: ({ sim }) => { sim.wkMode = 'open'; const e = document.getElementById('wkMode'); if (e) e.value = 'open'; } }, { t: 19000, run: ({ sim }) => { sim.wkMode = 'auto'; const e = document.getElementById('wkMode'); if (e) e.value = 'auto'; } }],
+  14: [{ t: 2500, run: ({ ui }) => ui.setRetarder(100) }, { t: 15000, run: ({ ui }) => ui.setRetarder(0) }],
+  15: [{ t: 3000, run: ({ ui }) => ui.setEngine(false) }, { t: 26000, run: ({ ui }) => ui.setEngine(true) }],
+};

@@ -116,6 +116,9 @@ huile à 20 °C ⇒ craque ; même cône à 85 °C ⇒ passe ; cône sain à fro
   passage 1→2 au ralenti → rapports 2-6 → pontage WK → ralentisseur → arrêt moteur/AIS → bilan). Chaque étape : texte simple,
   « Regardez », boutons qui pilotent la simulation, mesures en direct, mini-question corrigée, encart « Pour aller plus loin ».
   Navigation : boutons ou touches ← →.
+- **Démonstration automatique** : bouton « ▶ Démonstration automatique » (ou « ▶ Lecture auto » dans la carte) : la simulation se déroule seule
+  (engagement de D, 1ʳᵉ, passage 1→2 au ralenti, rapports, pontage WK, ralentisseur, arrêt moteur) pendant que chaque étape s'explique ;
+  pause possible, lecture vocale optionnelle (voix du navigateur). Durée ≈ 7 à 8 minutes.
 - **Charte** : palette relevée sur le portail OMNIplus ON (cyan `#00ADEE`, bleu nuit `#041E42`, gris-bleu `#627389`,
   fond `#F0F2F4`, coins 4 px). Thème **clair par défaut**, thème sombre bleu nuit. La police DaimlerCS (propriétaire) n'est pas
   embarquée (police système). Les couleurs de fonction (pression orange, lubrification bleue, défaut rouge) restent celles de la norme SSP.
