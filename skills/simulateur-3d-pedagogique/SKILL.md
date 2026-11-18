@@ -5,6 +5,8 @@ description: Construire un simulateur 3D interactif (Three.js, WebGL) pour la fo
 
 # Simulateur 3D pédagogique (Three.js)
 
+> **Version la plus récente (ZF EcoLife 2, parcours guidé pas à pas, démonstration automatique, charte OMNIplus ON, modèles + `scaffold.py`) : voir le skill `visualisation-guidee-piece`.** Ce skill-ci reste la référence pour la géométrie, la coupe et la livraison.
+
 Retour d'expérience du projet **TransmiLab 3D** (BVM 5+AR+différentiel, 80 pièces, 3 pannes d'atelier). Le but : relier chaque concept théorique à une réalité d'atelier (bruit, usure, métrologie, démontage). Le code de référence se trouve dans `references/` ; ne le recopier que si le mécanisme est proche, sinon s'en inspirer.
 
 ## Étape 0 — Cadrer (poser les questions utiles, pas plus de 4)
